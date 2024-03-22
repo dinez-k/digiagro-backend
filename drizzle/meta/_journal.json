@@ -1,0 +1,20 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1711007639446,
+      "tag": "0000_cool_starbolt",
+      "breakpoints": false
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1711007664797,
+      "tag": "0001_clammy_xorn",
+      "breakpoints": false
+    }
+  ]
+}
