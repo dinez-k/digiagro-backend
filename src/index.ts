@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 const bodyParser = require("body-parser")
 
 import {
@@ -13,7 +13,10 @@ import { City, Country } from "./schema";
 
 const app = express();
 app.use(bodyParser.json()); 
-app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+
 const port = process.env.PORT || "8000";
 
 app.get("/",(req,res)=>{
@@ -44,7 +47,6 @@ app.get("/citiesWithCountry", (req, res) => {
   });
 });
 
-// Please use POST for inserting data ;)  
 app.post("/insertCountries", async (req, res) => {
   const countriesData: Country[] = req.body;
   if (!Array.isArray(countriesData)) {
@@ -54,12 +56,30 @@ app.post("/insertCountries", async (req, res) => {
   res.send(countries);
 });
 
-// Please use POST for inserting data ;)cls
-app.post("/insertCities", async (req, res) => {
-  const citiesData: City[] = req.body;
-  console.log(citiesData);
-  const cities = await insertCity(citiesData);
-  res.send(cities);
+// app.post("/insertCities", async (req, res) => {
+//   const citiesData: City[] = req.body;
+//   console.log(citiesData);
+//   insertCity(citiesData).then((cities)=> res.status(201).send(cities)).catch((err)=>{
+//     throw new Error(err);
+//    // res.status(400).send({message : err + "" });
+//   });
+// });
+
+app.post("/insertCities", async (req, res , next: NextFunction) => {
+  try {
+      const citiesData: City[] = req.body;
+      console.log(citiesData);
+
+      const cities = await insertCity(citiesData);
+      res.status(201).send(cities);
+  } catch (error) {
+      next(error); //
+  }
+});
+
+app.use((error : Error, req : Request,res : Response, next : NextFunction) => {
+  console.error('Global error handler:', error.message);
+  res.status(400).send({ message: error.message });
 });
 
 app.listen(port, (err) => {
