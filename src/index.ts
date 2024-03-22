@@ -1,4 +1,6 @@
 import express from "express";
+const bodyParser = require("body-parser")
+
 import {
   getAllCities,
   insertCountry,
@@ -7,8 +9,11 @@ import {
   getAllCountriesWithCities,
   getAllCitiesWithCountry,
 } from "./queries";
+import { City, Country } from "./schema";
 
 const app = express();
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({ extended: true })); 
 const port = process.env.PORT || "8000";
 
 app.get("/",(req,res)=>{
@@ -39,27 +44,21 @@ app.get("/citiesWithCountry", (req, res) => {
   });
 });
 
-// Please use POST for inserting data ;)
-app.get("/insertCountries", async (req, res) => {
-  const countries = await insertCountry([
-    { id: 1, name: "Germany" },
-    { id: 2, name: "USA" },
-    { id: 3, name: "UK" },
-  ]);
-
+// Please use POST for inserting data ;)  
+app.post("/insertCountries", async (req, res) => {
+  const countriesData: Country[] = req.body;
+  if (!Array.isArray(countriesData)) {
+    return res.status(400).json({ message: 'Invalid data format. Expected an array.' });
+  }
+  const countries = await insertCountry(countriesData);
   res.send(countries);
 });
 
-// Please use POST for inserting data ;)
-app.get("/insertCities", async (req, res) => {
-  const cities = await insertCity([
-    { id: 1, name: "Berlin", countryId: 1, popularity: "popular" },
-    { id: 2, name: "Jersey", countryId: 2, popularity: "unknown" },
-    { id: 3, name: "London", countryId: 3, popularity: "known" },
-    { id: 4, name: "Luton", countryId: 3, popularity: "known" },
-    { id: 5, name: "Hamburg", countryId: 1, popularity: "known" },
-  ]);
-
+// Please use POST for inserting data ;)cls
+app.post("/insertCities", async (req, res) => {
+  const citiesData: City[] = req.body;
+  console.log(citiesData);
+  const cities = await insertCity(citiesData);
   res.send(cities);
 });
 
